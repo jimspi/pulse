@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ingestAllSources } from "@/lib/pipeline/ingest";
 import { processUnprocessedArticles } from "@/lib/pipeline/process";
+import { getArticles } from "@/lib/db";
+import { saveArticlesToBlob, isVercelBlobConfigured } from "@/lib/store";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -20,6 +22,16 @@ export async function POST(request: NextRequest) {
     const ingestResult = await ingestAllSources();
     const processResult = await processUnprocessedArticles();
 
+    // Persist processed articles to Vercel Blob for cross-invocation reads
+    let blobSaved = false;
+    if (isVercelBlobConfigured()) {
+      const allArticles = getArticles({ limit: 100 });
+      if (allArticles.length > 0) {
+        await saveArticlesToBlob(allArticles);
+        blobSaved = true;
+      }
+    }
+
     return NextResponse.json({
       success: true,
       ingestion: {
@@ -31,6 +43,7 @@ export async function POST(request: NextRequest) {
         processed: processResult.processed,
         errors: processResult.errors,
       },
+      blobSaved,
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
