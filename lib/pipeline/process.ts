@@ -29,15 +29,24 @@ export async function processUnprocessedArticles(): Promise<{
   let processed = 0;
   const errors: string[] = [];
 
-  for (const article of articles) {
-    try {
-      const result = await processArticle(article.raw_title, article.source_name);
-      updateProcessedArticle(article.id, result);
-      processed++;
-    } catch (err) {
-      errors.push(
-        `Failed to process "${article.raw_title}": ${err instanceof Error ? err.message : String(err)}`
-      );
+  // Process in parallel batches of 5 to stay within timeout
+  const BATCH_SIZE = 5;
+  for (let i = 0; i < articles.length; i += BATCH_SIZE) {
+    const batch = articles.slice(i, i + BATCH_SIZE);
+    const results = await Promise.allSettled(
+      batch.map(async (article) => {
+        const result = await processArticle(article.raw_title, article.source_name);
+        updateProcessedArticle(article.id, result);
+        return article.raw_title;
+      })
+    );
+
+    for (const r of results) {
+      if (r.status === "fulfilled") {
+        processed++;
+      } else {
+        errors.push(r.reason?.message || String(r.reason));
+      }
     }
   }
 

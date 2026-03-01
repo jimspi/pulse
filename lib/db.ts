@@ -206,7 +206,7 @@ export function getUnprocessedArticles(): Article[] {
   const db = getDb();
   return db
     .prepare(
-      `SELECT * FROM articles WHERE processed_title IS NULL ORDER BY published_at DESC LIMIT 40`
+      `SELECT * FROM articles WHERE processed_title IS NULL ORDER BY published_at DESC LIMIT 25`
     )
     .all() as Article[];
 }
