@@ -6,6 +6,7 @@ import RelativeTime from "./RelativeTime";
 interface ArticleBlockProps {
   article: {
     id: string;
+    source_url: string;
     processed_title: string;
     digest: string;
     why_it_matters: string;
@@ -33,7 +34,14 @@ export default function ArticleBlock({ article, index }: ArticleBlockProps) {
         </div>
 
         <h3 className="font-serif headline-article text-[var(--color-text)]">
-          {article.processed_title}
+          <a
+            href={article.source_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-[var(--color-accent)] transition-colors duration-200"
+          >
+            {article.processed_title}
+          </a>
         </h3>
 
         <p className="mt-2.5 text-[15px] leading-relaxed text-[var(--color-text)] opacity-90">

@@ -6,6 +6,7 @@ import RelativeTime from "./RelativeTime";
 interface LeadStoryProps {
   article: {
     id: string;
+    source_url: string;
     processed_title: string;
     digest: string;
     why_it_matters: string;
@@ -34,7 +35,14 @@ export default function LeadStory({ article }: LeadStoryProps) {
         </div>
 
         <h2 className="font-serif headline-medium text-[var(--color-text)]">
-          {article.processed_title}
+          <a
+            href={article.source_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-[var(--color-accent)] transition-colors duration-200"
+          >
+            {article.processed_title}
+          </a>
         </h2>
 
         <p className="mt-5 body-text text-[var(--color-text)] leading-relaxed max-w-2xl">
