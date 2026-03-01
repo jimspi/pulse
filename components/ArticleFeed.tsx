@@ -5,6 +5,7 @@ import ArticleBlock from "./ArticleBlock";
 
 interface Article {
   id: string;
+  source_url: string;
   processed_title: string;
   digest: string;
   why_it_matters: string;
