@@ -1,0 +1,133 @@
+import sharp from "sharp";
+import fs from "fs";
+import path from "path";
+
+// Sleek 3D "P" mark with a pulse line accent
+// Dark background, warm off-white letter, editorial red pulse line
+// Depth through layered gradients and subtle shadow
+const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <!-- Background gradient: deep charcoal with subtle warm tint -->
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1E1E1C"/>
+      <stop offset="50%" stop-color="#161614"/>
+      <stop offset="100%" stop-color="#111110"/>
+    </linearGradient>
+
+    <!-- 3D letter gradient: warm white with depth -->
+    <linearGradient id="letter" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0%" stop-color="#FAF9F6"/>
+      <stop offset="40%" stop-color="#F0EFEB"/>
+      <stop offset="100%" stop-color="#D5D3CE"/>
+    </linearGradient>
+
+    <!-- Shadow for 3D depth on letter -->
+    <filter id="shadow" x="-5%" y="-5%" width="115%" height="115%">
+      <feDropShadow dx="2" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+
+    <!-- Subtle inner glow on background -->
+    <radialGradient id="glow" cx="0.35" cy="0.3" r="0.6">
+      <stop offset="0%" stop-color="#2A2825" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#111110" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Pulse line gradient -->
+    <linearGradient id="pulseGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#E8503A" stop-opacity="0.1"/>
+      <stop offset="30%" stop-color="#E8503A" stop-opacity="1"/>
+      <stop offset="70%" stop-color="#E8503A" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#E8503A" stop-opacity="0.1"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background with rounded corners -->
+  <rect width="512" height="512" rx="108" ry="108" fill="url(#bg)"/>
+
+  <!-- Subtle surface glow for 3D feel -->
+  <rect width="512" height="512" rx="108" ry="108" fill="url(#glow)"/>
+
+  <!-- Subtle top edge highlight for 3D -->
+  <rect x="24" y="16" width="464" height="2" rx="1" fill="#333330" opacity="0.6"/>
+
+  <!-- The "P" letterform — editorial serif style with 3D shadow -->
+  <g filter="url(#shadow)">
+    <path d="
+      M 148 120
+      L 148 392
+      L 192 392
+      L 192 296
+      L 280 296
+      C 356 296 396 256 396 208
+      C 396 160 356 120 280 120
+      Z
+      M 192 164
+      L 272 164
+      C 328 164 352 184 352 208
+      C 352 232 328 252 272 252
+      L 192 252
+      Z
+    " fill="url(#letter)"/>
+  </g>
+
+  <!-- Pulse/heartbeat line cutting across -->
+  <path d="
+    M 60 340
+    L 148 340
+    L 168 340
+    L 188 310
+    L 208 370
+    L 228 320
+    L 248 350
+    L 268 340
+    L 452 340
+  " fill="none" stroke="url(#pulseGrad)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Small dot accent at pulse peak -->
+  <circle cx="208" cy="370" r="3.5" fill="#E8503A" opacity="0.8"/>
+</svg>`;
+
+const publicDir = path.join(process.cwd(), "public");
+if (!fs.existsSync(publicDir)) {
+  fs.mkdirSync(publicDir, { recursive: true });
+}
+
+// Save SVG
+fs.writeFileSync(path.join(publicDir, "icon.svg"), svg);
+
+// Generate apple-touch-icon (180x180)
+await sharp(Buffer.from(svg))
+  .resize(180, 180)
+  .png()
+  .toFile(path.join(publicDir, "apple-touch-icon.png"));
+
+// Generate favicon-192 (for Android/PWA)
+await sharp(Buffer.from(svg))
+  .resize(192, 192)
+  .png()
+  .toFile(path.join(publicDir, "icon-192.png"));
+
+// Generate favicon-512 (for PWA splash)
+await sharp(Buffer.from(svg))
+  .resize(512, 512)
+  .png()
+  .toFile(path.join(publicDir, "icon-512.png"));
+
+// Generate favicon.ico (32x32 png, browsers accept it)
+await sharp(Buffer.from(svg))
+  .resize(32, 32)
+  .png()
+  .toFile(path.join(publicDir, "favicon.png"));
+
+// Also make a proper 32x32 ico-compatible file
+await sharp(Buffer.from(svg))
+  .resize(32, 32)
+  .toFormat("png")
+  .toFile(path.join(publicDir, "favicon-32.png"));
+
+console.log("Generated all icons in /public:");
+console.log("  - icon.svg");
+console.log("  - apple-touch-icon.png (180x180)");
+console.log("  - icon-192.png (192x192)");
+console.log("  - icon-512.png (512x512)");
+console.log("  - favicon.png (32x32)");

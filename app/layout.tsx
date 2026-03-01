@@ -28,6 +28,21 @@ export const metadata: Metadata = {
   title: "The Pulse — Daily AI Intelligence",
   description:
     "Daily intelligence on AI advancement. Clear, honest reporting on how artificial intelligence is getting smarter, faster, and more capable.",
+  icons: {
+    icon: [
+      { url: "/favicon.png", sizes: "32x32", type: "image/png" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    title: "The Pulse",
+    statusBarStyle: "black-translucent",
+  },
   openGraph: {
     title: "The Pulse — Daily AI Intelligence",
     description:
