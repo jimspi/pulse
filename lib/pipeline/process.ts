@@ -100,9 +100,11 @@ Respond in JSON with these exact fields:
   return parsed;
 }
 
-// Seed the database with sample articles when no OpenAI key is available or DB is empty
+// Seed the database with sample articles when DB is empty
+// On Vercel, skip seeding — /tmp is ephemeral and we want real data from the pipeline
 export async function seedSampleArticles(): Promise<void> {
   if (getArticleCount() > 0) return;
+  if (process.env.VERCEL) return;
 
   if (isOpenAIConfigured()) {
     await seedWithOpenAI();

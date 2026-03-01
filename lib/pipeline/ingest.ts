@@ -81,8 +81,16 @@ async function fetchSource(
   const feed = await parser.parseURL(url);
   const items: RawItem[] = [];
 
-  for (const entry of feed.items.slice(0, 15)) {
+  const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+
+  for (const entry of feed.items.slice(0, 20)) {
     if (!entry.title || !entry.link) continue;
+
+    // Filter to last 7 days only
+    const pubDate = entry.pubDate
+      ? new Date(entry.pubDate)
+      : new Date();
+    if (pubDate.getTime() < sevenDaysAgo) continue;
 
     const isAIRelated = isLikelyAIContent(entry.title, entry.contentSnippet || "");
     if (!isAIRelated && sourceName !== "ArXiv CS.AI") continue;
@@ -90,9 +98,7 @@ async function fetchSource(
     items.push({
       title: entry.title.trim(),
       link: entry.link.trim(),
-      pubDate: entry.pubDate
-        ? new Date(entry.pubDate).toISOString()
-        : new Date().toISOString(),
+      pubDate: pubDate.toISOString(),
       sourceName,
     });
   }

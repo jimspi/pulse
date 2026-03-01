@@ -110,7 +110,7 @@ export function getArticles(opts: {
 
 export function getTrendingArticles(limit = 5): Article[] {
   const db = getDb();
-  const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
+  const cutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
   return db
     .prepare(
@@ -206,7 +206,7 @@ export function getUnprocessedArticles(): Article[] {
   const db = getDb();
   return db
     .prepare(
-      `SELECT * FROM articles WHERE processed_title IS NULL ORDER BY published_at DESC LIMIT 20`
+      `SELECT * FROM articles WHERE processed_title IS NULL ORDER BY published_at DESC LIMIT 40`
     )
     .all() as Article[];
 }

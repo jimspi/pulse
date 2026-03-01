@@ -38,7 +38,7 @@ export const NEWS_SOURCES: NewsSource[] = [
   },
   {
     id: "openai-blog",
-    name: "OpenAI Blog",
+    name: "OpenAI",
     url: "https://openai.com/blog/rss.xml",
     type: "rss",
   },
@@ -61,9 +61,21 @@ export const NEWS_SOURCES: NewsSource[] = [
     type: "rss",
   },
   {
-    id: "anthropic-news",
-    name: "Anthropic",
-    url: "https://www.anthropic.com/rss.xml",
+    id: "google-ai",
+    name: "Google AI",
+    url: "https://blog.google/technology/ai/rss/",
+    type: "rss",
+  },
+  {
+    id: "microsoft-research",
+    name: "Microsoft Research",
+    url: "https://www.microsoft.com/en-us/research/feed/",
+    type: "rss",
+  },
+  {
+    id: "nvidia-blog",
+    name: "NVIDIA",
+    url: "https://blogs.nvidia.com/feed/",
     type: "rss",
   },
 ];
