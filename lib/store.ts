@@ -14,7 +14,7 @@ export async function saveArticlesToBlob(articles: Article[]): Promise<void> {
     lastRefreshed: new Date().toISOString(),
   };
 
-  // Delete old blob if it exists
+  // Clean up any duplicate blobs from previous addRandomSuffix behavior
   try {
     const existing = await list({ prefix: BLOB_KEY });
     for (const blob of existing.blobs) {
@@ -36,7 +36,14 @@ export async function loadArticlesFromBlob(): Promise<StoredData | null> {
     const existing = await list({ prefix: BLOB_KEY });
     if (existing.blobs.length === 0) return null;
 
-    const res = await fetch(existing.blobs[0].url);
+    // Sort by uploadedAt descending to always read the latest blob
+    const sorted = [...existing.blobs].sort(
+      (a, b) =>
+        new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
+    );
+
+    // Bypass Next.js fetch cache to always get fresh blob content
+    const res = await fetch(sorted[0].url, { cache: "no-store" });
     if (!res.ok) return null;
 
     return (await res.json()) as StoredData;
