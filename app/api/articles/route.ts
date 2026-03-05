@@ -2,8 +2,28 @@ import { NextRequest, NextResponse } from "next/server";
 import { getArticles } from "@/lib/db";
 import { seedSampleArticles } from "@/lib/pipeline/process";
 import { loadArticlesFromBlob, isVercelBlobConfigured } from "@/lib/store";
+import { titleSimilarity } from "@/lib/utils";
+import type { Article } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
+
+// Remove near-duplicate articles, keeping the first (highest-ranked) one
+function deduplicateByTitle(articles: Article[]): Article[] {
+  const result: Article[] = [];
+  for (const article of articles) {
+    const isDuplicate = result.some(
+      (existing) =>
+        titleSimilarity(
+          existing.processed_title || existing.raw_title,
+          article.processed_title || article.raw_title
+        ) > 0.5
+    );
+    if (!isDuplicate) {
+      result.push(article);
+    }
+  }
+  return result;
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,7 +36,7 @@ export async function GET(request: NextRequest) {
     if (isVercelBlobConfigured()) {
       const data = await loadArticlesFromBlob();
       if (data && data.articles.length > 0) {
-        let articles = data.articles;
+        let articles = deduplicateByTitle(data.articles);
 
         if (category && category !== "all") {
           articles = articles.filter((a) => a.primary_category === category);
